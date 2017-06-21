@@ -3,6 +3,7 @@ require 'json'
 module GeosparqlToGeojson
   class Converter
     def initialize(constituency)
+      require 'pry'; binding.pry
       @constituency = constituency
       @geosparql    = constituency.area
     end
