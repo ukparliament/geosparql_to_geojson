@@ -2,61 +2,80 @@ require 'json'
 
 module GeosparqlToGeojson
   class Converter
-    def initialize(constituency)
-      require 'pry'; binding.pry
-      @constituency = constituency
-      @geosparql    = constituency.area
+    GEOMETRY_TYPES = %w(Point Multipoint LineString Multiline Polygon MultiPolygon GeometryCollection).freeze
+
+    def initialize(geosparql_data)
+      @geosparql = geosparql_data
     end
 
     def convert
-      @center_point = generate_point_hash(@geosparql.longitude, @geosparql.latitude)
-      @polygons     = generate_polygon_hash(@geosparql.polygon)
-      generate_polygons_json
-      generate_json
+      collect_geosparql_data
     end
 
-    def generate_point_hash(longitude, latitude)
-      { type: 'Point', coordinates: [longitude[0].to_f, latitude[0].to_f] }
-    end
-
-    def generate_polygon_hash(polygons)
-      polygon_array = []
-      [*polygons].each do |polygon|
-        polygon_points = polygon.scan(/\(\((.*?)\)\)/).first
-        polygon_points = polygon_points.first.split(',')
-        polygon_points.map! { |coordinate_pairs| coordinate_pairs.split(' ').map!(&:to_f) }
-
-        polygon_array << { type: 'Polygon', coordinates: [polygon_points] }
+    # create hash of each geometry type and it's values
+    def collect_geosparql_data
+      @data_store = {}
+      GEOMETRY_TYPES.each do |geometry_type|
+        geosparql_data_match = @geosparql.scan(/#{geometry_type}\(+(.*?)\)+/i)
+        @data_store[geometry_type.to_sym] = geosparql_data_match unless geosparql_data_match.empty?
       end
 
-      polygon_array
+      format_geosparql_data
     end
 
-    def generate_json
+    # split values into arrays and convert them to floats
+    def format_geosparql_data
+      @data_store.keys.each do |key|
+        @data_store[key.to_sym].map! do |values|
+          if key == :Point
+            format_point_data(values)
+          elsif key == :LineString
+            format_linestring_data(values)
+          else
+            format_complext_coordinates(values)
+          end
+        end
+      end
+
+      generate_hash_from_values
+    end
+
+    def format_point_data(values)
+      values[0].split(/[\s]|[,]/).map!(&:to_f)
+    end
+
+    def format_linestring_data(values)
+      values[0].split(/[\s]|[,]/).map!(&:to_f).each_slice(2).to_a.reverse
+    end
+
+    def format_complext_coordinates(values)
+      [values[0].split(/[\s]|[,]/).map!(&:to_f).each_slice(2).to_a.reverse]
+    end
+
+    def generate_hash_from_values
+      @data_hash_array = []
+      @data_store.keys.each do |key|
+        @data_store[key.to_sym].each do |data|
+           @data_hash_array << generate_feature_hash({ type: key.to_s, coordinates: data })
+        end
+      end
+      generate_geojson_from_hash
+    end
+
+    def generate_feature_hash(data_hash)
+      {
+        type: 'Feature',
+        geometry: data_hash,
+        properties: {}
+      }
+    end
+
+    def generate_geojson_from_hash
       data_hash = {
                     type: 'FeatureCollection',
-                    features: [{
-                      type: 'Feature',
-                      geometry: @center_point,
-                      properties: {
-                        description: 'center_point'
-                      }
-                    }]
+                    features: @data_hash_array
                   }
-      @polygons.each { |polygon| data_hash[:features] << polygon }
       data_hash.to_json
-    end
-
-    def generate_polygons_json
-      @polygons.map! do |polygon|
-        {
-          type: 'Feature',
-          geometry: polygon,
-          properties: {
-            description: 'polygon'
-          }
-        }
-      end
     end
   end
 end
