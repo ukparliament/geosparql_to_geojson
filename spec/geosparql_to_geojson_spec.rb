@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe GeosparqlToGeojson do
@@ -6,8 +8,9 @@ RSpec.describe GeosparqlToGeojson do
   end
 
   context '#convert_to_geojson' do
-    let(:ntriple_data){ File.read('spec/fixtures/geosparql/generic_data.nt') }
-    subject { described_class.convert_to_geojson(ntriple_data) }
+    let(:ntriple_data) { File.read('spec/fixtures/geosparql/generic_data.nt') }
+    subject { described_class.convert_to_geojson(geosparql_values: ntriple_data, geosparql_properties: {}, reverse: false).geojson }
+
     it 'will convert data to GeoJSON' do
       expect(JSON.parse(subject)['features'][0]['type']).to eq('Feature')
       expect(JSON.parse(subject)['features'][0]['geometry']['type']).to eq('Point')

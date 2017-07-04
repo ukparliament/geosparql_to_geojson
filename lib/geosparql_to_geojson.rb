@@ -1,19 +1,19 @@
 require 'geosparql_to_geojson/version'
 require 'geosparql_to_geojson/converter'
+require 'geosparql_to_geojson/geojson'
 require 'geosparql_to_geojson/geojson_validator.rb'
-require 'grom'
 
-# Namespace for classes and modules that deal with converting GeoSparql to GeoJSON  
+# Namespace for classes and modules that deal with converting GeoSparql to GeoJSON
+# @since 0.1.0
 module GeosparqlToGeojson
-  def self.convert_to_geojson(geosparql_data)
-    # TODO: refactor
-    geojson = GeosparqlToGeojson::Converter.new(geosparql_data).convert
-    geojson_validation = GeosparqlToGeojson::GeojsonValidator.new(geojson)
-
-    if geojson_validation.valid?
-      geojson
-    else
-      geojson_validation.errors
-    end
+  # Convert GeoSparql to GeoJSON
+  #
+  # @param [String] geosparql_values the GeoSparql values
+  # @param [Hash] geosparql_properties the properties to be added to the GeoJSON output
+  # @param [true, false] reverse states whether to reverse the GeoJSON coordinates
+  #
+  # @return [GeosparqlToGeojson::GeoJson]
+  def self.convert_to_geojson(geosparql_values: '', geosparql_properties: {}, reverse: false)
+    GeosparqlToGeojson::Converter.new(geosparql_values, geosparql_properties, reverse).convert
   end
 end

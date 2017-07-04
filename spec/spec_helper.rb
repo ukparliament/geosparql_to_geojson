@@ -1,3 +1,11 @@
+require 'simplecov'
+require 'coveralls'
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
+  Coveralls::SimpleCov::Formatter,
+  SimpleCov::Formatter::HTMLFormatter
+])
+SimpleCov.start
+
 require "bundler/setup"
 require "geosparql_to_geojson"
 
