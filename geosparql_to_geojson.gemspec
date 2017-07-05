@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'geosparql_to_geojson/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'geosparql-to-geojson'
+  spec.name          = 'geosparql_to_geojson'
   spec.version       = GeosparqlToGeojson::VERSION
   spec.authors       = ['Callum Neve-Jones']
   spec.email         = ['nevejonesc@parliament.uk']

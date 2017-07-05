@@ -84,7 +84,7 @@ validated_geojson.errors
 To clone the repository and set up the dependencies, run the following:
 
 ```bash
-git clone https://github.com/ukparliament/geosparql-to-geojson.git
+git clone https://github.com/ukparliament/geosparql_to_geojson.git
 cd geosparql_to_geojson
 bundle install
 ```
@@ -114,21 +114,21 @@ If you wish to submit a bug fix or feature, you can create a pull request and it
 [ruby]:               https://www.ruby-lang.org/en/
 [bundler]:            http://bundler.io
 [rspec]:              http://rspec.info 
-[geosparqltogeojson]: https://github.com/ukparliament/geosparql-to-geojson
+[geosparqltogeojson]: https://github.com/ukparliament/geosparql_to_geojson
 [pds]:                https://www.parliament.uk/mps-lords-and-offices/offices/bicameral/parliamentary-digital-service/
 [geosparql]:          http://www.opengis.net/doc/IS/geosparql/1.0
 [geojson]:            https://tools.ietf.org/html/rfc7946#appendix-A.2
-[ruby-version]:       https://github.com/ukparliament/geosparql-to-geojson/blob/master/.ruby-version
+[ruby-version]:       https://github.com/ukparliament/geosparql_to_geojson/blob/master/.ruby-version
 
 
-[info-gem]:   https://rubygems.org/gems/geosparql-to-geojson
-[shield-gem]: https://img.shields.io/gem/v/geosparql-to-geojson.svg
+[info-gem]:   https://rubygems.org/gems/geosparql_to_geojson
+[shield-gem]: https://img.shields.io/gem/v/geosparql_to_geojson.svg
 
-[info-travis]:   https://travis-ci.org/ukparliament/geosparql-to-geojson
-[shield-travis]: https://img.shields.io/travis/ukparliament/geosparql-to-geojson.svg
+[info-travis]:   https://travis-ci.org/ukparliament/geosparql_to_geojson
+[shield-travis]: https://img.shields.io/travis/ukparliament/geosparql_to_geojson.svg
 
-[info-coveralls]:   https://coveralls.io/github/ukparliament/geosparql-to-geojson
-[shield-coveralls]: https://img.shields.io/coveralls/ukparliament/geosparql-to-geojson.svg
+[info-coveralls]:   https://coveralls.io/github/ukparliament/geosparql_to_geojson
+[shield-coveralls]: https://img.shields.io/coveralls/ukparliament/geosparql_to_geojson.svg
 
 [info-license]:   http://www.parliament.uk/site-information/copyright/open-parliament-licence/
 [shield-license]: https://img.shields.io/badge/license-Open%20Parliament%20Licence-blue.svg
