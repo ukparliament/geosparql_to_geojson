@@ -130,5 +130,5 @@ If you wish to submit a bug fix or feature, you can create a pull request and it
 [info-coveralls]:   https://coveralls.io/github/ukparliament/geosparql_to_geojson
 [shield-coveralls]: https://img.shields.io/coveralls/ukparliament/geosparql_to_geojson.svg
 
-[info-license]:   http://www.parliament.uk/site-information/copyright/open-parliament-licence/
+[info-license]:   http://www.parliament.uk/site-information/copyright-parliament/open-parliament-licence/
 [shield-license]: https://img.shields.io/badge/license-Open%20Parliament%20Licence-blue.svg
