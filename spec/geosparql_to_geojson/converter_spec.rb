@@ -52,6 +52,14 @@ RSpec.describe GeosparqlToGeojson::Converter do
     end
   end
 
+  context 'polygon is an array' do
+    let(:geosparql_array) { IO.readlines('spec/fixtures/geosparql/multiple_polygons') }
+
+    it 'will convert the array' do
+      expect(GeosparqlToGeojson::Converter.new(geosparql_array, {}, false).convert).to be_a(GeosparqlToGeojson::GeoJson)
+    end
+  end
+
   context 'n-triple data' do
     let(:geosparql_data) { File.read('spec/fixtures/geosparql/ntriple.nt') }
     subject { GeosparqlToGeojson::Converter.new(geosparql_data, {}, false).convert.geojson }
@@ -81,18 +89,18 @@ RSpec.describe GeosparqlToGeojson::Converter do
   end
 
   context '#format_data' do
-    let(:values) { ['2.123 3.234'] }
+    let(:values) { '2.123 3.234' }
     let(:converter) { GeosparqlToGeojson::Converter.new(values, {}, true) }
 
     context 'point' do
       it 'formats the value string' do
-        expect(converter.format_data(values, :Point)).to eq([3.234, 2.123])
+        expect(converter.send(:format_data, values, :Point)).to eq([3.234, 2.123])
       end
 
       context 'do not reverse' do
         let(:converter) { GeosparqlToGeojson::Converter.new(values, {}, false) }
         it 'will not reverse values' do
-          expect(converter.format_data(values, :Point)).to eq([2.123, 3.234])
+          expect(converter.send(:format_data, values, :Point)).to eq([2.123, 3.234])
         end
       end
     end
@@ -101,16 +109,25 @@ RSpec.describe GeosparqlToGeojson::Converter do
       let(:values) { ['1.23 2.34 3.45 4.56 5.67 6.78'] }
 
       it 'formats the value string' do
-        expect(converter.format_data(values, :Polygon)).to eq([[[6.78, 5.67], [4.56, 3.45], [2.34, 1.23]]])
+        expect(converter.send(:format_data, values, :Polygon)).to eq([[[6.78, 5.67], [4.56, 3.45], [2.34, 1.23]]])
       end
 
       context 'odd number of values' do
         let(:values) { ['1.23 2.34 3.45 4.56 5.67'] }
 
         it 'formats the value string' do
-          expect(converter.format_data(values, :Polygon)).to eq([[[5.67, 4.56], [3.45, 2.34], [1.23]]])
+          expect(converter.send(:format_data, values, :Polygon)).to eq([[[5.67, 4.56], [3.45, 2.34], [1.23]]])
         end
       end
+    end
+  end
+
+  context '#convert_key_to_correct_format' do
+    let(:values) { '2.123 3.234' }
+    let(:converter) { GeosparqlToGeojson::Converter.new(values, {}, true) }
+
+    it 'will correctly format key' do
+      expect(converter.send(:convert_key_to_correct_format, 'muLtiline')).to eq(:Multiline)
     end
   end
 
