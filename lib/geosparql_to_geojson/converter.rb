@@ -5,8 +5,19 @@ module GeosparqlToGeojson
   #
   # @since 0.1.0
   class Converter
-    # Constant contains every GeoSparql data type.
-    GEOMETRY_TYPES = %w[Point Multipoint LineString Multiline Polygon MultiPolygon GeometryCollection].freeze
+    # Constant containing hash of GeoSparql types and the correctly formatted version.
+    GEOSPARQL_TYPES = {
+      polygon:            :Polygon,
+      point:              :Point,
+      multipoint:         :MultiPoint,
+      linestring:         :LineString,
+      multipolygon:       :MultiPolygon,
+      geometrycollection: :GeometryCollection,
+      multiline:          :Multiline
+    }.freeze
+
+    # Constant regex containing every GeoSparql data type that finds the type and the type's values.
+    GEOMETRY_REGEX = /(#{GEOSPARQL_TYPES.values.join('|')})\(+(.*?)\)+/i
 
     # Creates a new instance of GeosparqlToGeojson::Converter
     #
@@ -39,15 +50,38 @@ module GeosparqlToGeojson
       GeosparqlToGeojson::GeoJson.new(collect_geosparql_data)
     end
 
+    private
+
     # Creates a hash of each GeoSparql type present and it's values.
     def collect_geosparql_data
       @data_store = {}
-      GEOMETRY_TYPES.each do |geometry_type|
-        geosparql_data_match = @geosparql_values.scan(/#{geometry_type}\(+(.*?)\)+/i)
-        @data_store[geometry_type.to_sym] = geosparql_data_match unless geosparql_data_match.empty?
+
+      if @geosparql_values.is_a?(Array)
+        @geosparql_values.each do |value|
+          scanned_data = value.scan(GEOMETRY_REGEX)
+          populate_data_hash(scanned_data)
+        end
+      else
+        scanned_data = @geosparql_values.scan(GEOMETRY_REGEX)
+        populate_data_hash(scanned_data)
       end
 
       format_geosparql_data
+    end
+
+    # Sets the hash key to the GeoSparql type if it isn't already set and adds the GeoSparql values
+    def populate_data_hash(scanned_geosparql_data)
+      scanned_geosparql_data.each do |data|
+        key = convert_key_to_correct_format(data[0])
+        @data_store[key] = [] unless @data_store[key]
+        @data_store[key] << data[1]
+      end
+    end
+
+    # Converts the key that's captured by the regex into the correct format
+    def convert_key_to_correct_format(key)
+      key = key.downcase
+      GEOSPARQL_TYPES[key.to_sym]
     end
 
     # Splits values into arrays and converts them into floats.
@@ -69,7 +103,9 @@ module GeosparqlToGeojson
     #
     # @return [Array]
     def format_data(values, key)
-      values = @reverse ? values[0].split(/[\s]|[,]/).map!(&:to_f).reverse : values[0].split(/[\s]|[,]/).map!(&:to_f)
+      values = values.first if values.is_a?(Array)
+      values = values.split(/[\s]|[,]/).map!(&:to_f)
+      values.reverse! if @reverse
 
       values = values.each_slice(2).to_a if key != :Point
       values = [values] if key != :Point && key != :LineString
@@ -81,7 +117,7 @@ module GeosparqlToGeojson
       @data_hash_array = []
       @data_store.keys.each do |key|
         @data_store[key.to_sym].each do |data|
-          @data_hash_array << generate_feature_hash({ type: key.to_s, coordinates: data })
+          @data_hash_array << generate_feature_hash(type: key.to_s, coordinates: data)
         end
       end
 
@@ -103,11 +139,10 @@ module GeosparqlToGeojson
     #
     # @return [String] a string of GeoJSON
     def generate_feature_collection
-      data_hash = {
-                    type: 'FeatureCollection',
-                    features: @data_hash_array
-                  }
-      data_hash.to_json
+      {
+        type: 'FeatureCollection',
+        features: @data_hash_array
+      }.to_json
     end
   end
 end
