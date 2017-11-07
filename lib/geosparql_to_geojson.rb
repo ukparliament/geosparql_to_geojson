@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'geosparql_to_geojson/version'
 require 'geosparql_to_geojson/converter'
 require 'geosparql_to_geojson/geojson'
@@ -14,6 +16,6 @@ module GeosparqlToGeojson
   #
   # @return [GeosparqlToGeojson::GeoJson]
   def self.convert_to_geojson(geosparql_values: '', geosparql_properties: {}, reverse: false)
-    GeosparqlToGeojson::Converter.new(geosparql_values, geosparql_properties, reverse).convert
+    GeosparqlToGeojson::Converter::BaseConverter.new(geosparql_values, geosparql_properties, reverse).convert
   end
 end
